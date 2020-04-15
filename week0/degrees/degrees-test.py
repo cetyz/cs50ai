@@ -1,7 +1,7 @@
 import csv
 import sys
 
-from util import Node, StackFrontier, QueueFrontier
+from util import Node, StackFrontier, QueueFrontier, GreedyFrontier
 
 # Maps names to a set of corresponding person_ids
 names = {}
@@ -94,32 +94,23 @@ def shortest_path(source, target):
     # keep track of number of states explored
     num_explored = 0
     
-    # in our case, each state is a person?
-    # so neighbours would be other persons
-    # note that the function that calls for neighbours also
-    # returns movies. will need to track the movies as well
-    
-    # so source and target will be individual ids
-    # but we need to take into account the movie at the start and end
-    
-    # so each node is a person (id)?
-    # and each neighbour will be another id from the neighbour function
-    
-    # is action the movie?? because it's the movie we're moving to??
-    
-    
     # latest update (IMO)
     # state is person id
     # action is movie id
     
+    # some info for our heuristic
+    target_bday = people[source]['birth']
+    
     # initialize frontier to starting position
     start = Node(state=source, parent=None, action=None)
-    frontier = QueueFrontier()
+    frontier = GreedyFrontier()
     frontier.add(start)
     
     # initialize empty explored set
     explored = set()
     
+    # indicate start node
+    first = True
     # keep looping until solution found
     while True:
         
@@ -128,8 +119,19 @@ def shortest_path(source, target):
             return(None)
             
         # choose a node from the frontier
-        # FIND A BETTER WAY TO CHOOSE movie year??
-        node = frontier.remove()
+        # let's try to start with movies closer to the target's bday 
+        # those with same differences will overwrite but whatever
+        dist_dict = {}
+        
+        if first:
+            node = frontier.remove(index=0)
+            first = False
+        else:
+            for i, node in enumerate(frontier.frontier):
+                movie_release = movies[node.action]['year']
+                dist = abs(int(movie_release) - int(target_bday))
+                dist_dict[str(dist)] = i
+            node = frontier.remove(index=i)
         num_explored += 1
         
         # if node is the goal, we have a solution

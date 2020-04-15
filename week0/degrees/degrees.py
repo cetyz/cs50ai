@@ -1,7 +1,7 @@
 import csv
 import sys
 
-from util import Node, StackFrontier, QueueFrontier, GreedyFrontier
+from util import Node, StackFrontier, QueueFrontier
 
 # Maps names to a set of corresponding person_ids
 names = {}
@@ -94,23 +94,17 @@ def shortest_path(source, target):
     # keep track of number of states explored
     num_explored = 0
     
-    # latest update (IMO)
     # state is person id
     # action is movie id
     
-    # some info for our heuristic
-    target_bday = people[source]['birth']
-    
     # initialize frontier to starting position
     start = Node(state=source, parent=None, action=None)
-    frontier = GreedyFrontier()
+    frontier = QueueFrontier()
     frontier.add(start)
     
     # initialize empty explored set
     explored = set()
     
-    # indicate start node
-    first = True
     # keep looping until solution found
     while True:
         
@@ -119,19 +113,7 @@ def shortest_path(source, target):
             return(None)
             
         # choose a node from the frontier
-        # let's try to start with movies closer to the target's bday 
-        # those with same differences will overwrite but whatever
-        dist_dict = {}
-        
-        if first:
-            node = frontier.remove(index=0)
-            first = False
-        else:
-            for i, node in enumerate(frontier.frontier):
-                movie_release = movies[node.action]['year']
-                dist = abs(int(movie_release) - int(target_bday))
-                dist_dict[str(dist)] = i
-            node = frontier.remove(index=i)
+        node = frontier.remove()
         num_explored += 1
         
         # if node is the goal, we have a solution

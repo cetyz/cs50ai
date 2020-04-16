@@ -221,7 +221,10 @@ def minimax(board):
     
     possible_actions = actions(board)
     
-    for action in possible_actions:
+    if current_player == X: # want to max out
+        pass
+    
+    for i, action in enumerate(possible_actions):
         pass
     
     

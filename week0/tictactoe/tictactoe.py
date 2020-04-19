@@ -4,6 +4,7 @@ Tic Tac Toe Player
 
 import math
 from random import randint
+from copy import deepcopy
 
 X = "X"
 O = "O"
@@ -79,7 +80,8 @@ def result(board, action):
     Importantly, the original board should be left unmodified
     """
     val = player(board)
-    new_board = board.copy()
+#    new_board = board.copy()
+    new_board = deepcopy(board)
     
     new_board[action[0]][action[1]] = val
     
@@ -203,6 +205,47 @@ def utility(board):
         return(0)
 
 
+#def max_value(board):
+#    if terminal(board):
+#        return(utility(board))
+#    v = -99999
+#    for action in actions(board):
+#        mv = min_value(result(board, action))
+#        v = max(v, mv)
+#    return(v)
+#        
+#def min_value(board):
+#    if terminal(board):
+#        return(utility(board))
+#    v = 99999
+#    for action in actions(board):
+#        mv = max_value(result(board, action))
+#        v = min(v, mv)
+#    return(v)
+        
+def max_value(board):
+    if terminal(board):
+        return(utility(board), None)
+    v = -9
+    best_action = None
+    for action in actions(board):
+        mv = min_value(result(board, action))
+        if mv[0] > v:
+            best_action = action
+        v = max(v, mv[0])
+    return(v, best_action)
+        
+def min_value(board):
+    if terminal(board):
+        return(utility(board), None)
+    v = 9
+    for action in actions(board):
+        mv = max_value(result(board, action))
+        if mv[0] < v:
+            best_action = action
+        v = min(v, mv[0])
+    return(v, best_action)
+
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
@@ -219,23 +262,28 @@ def minimax(board):
     
     current_player = player(board)
     
-    possible_actions = actions(board)
+    if current_player == X:
+        action = max_value(board)[1]
+        return(action)
     
-    if current_player == X: # want to max out
-        pass
-    
-    for i, action in enumerate(possible_actions):
-        pass
+    if current_player == O:
+        action = min_value(board)[1]
+        return(action)
     
     
     # for now
-    return(list(possible_actions)[randint(0, len(possible_actions)-1)])    
+#    possible_actions = actions(board)
+#    return(list(possible_actions)[randint(0, len(possible_actions)-1)])    
     
 
 if __name__ == "__main__":
     
-    board = [[X, EMPTY, X],
-             [X, O, X],
-             [O, O, X]]
+#    board = [[EMPTY, X, O],
+#             [O, X, X],
+#             [X, EMPTY, O]]
+
+    board = [[EMPTY, EMPTY, EMPTY],
+             [EMPTY, EMPTY, EMPTY],
+             [EMPTY, EMPTY, EMPTY]]
     
     print(player(board))
